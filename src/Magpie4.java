@@ -54,6 +54,14 @@ public class Magpie4
 			response = transformIWantToStatement(statement);
 		}
 
+
+		else if (findKeyword(statement, "I want", 0) >= 0)
+		{
+			response = transformIWantStatement(statement);
+		}
+
+
+
 		else
 		{
 			// Look for a two word (you <something> me)
@@ -65,6 +73,17 @@ public class Magpie4
 			{
 				response = transformYouMeStatement(statement);
 			}
+			else if(psn<0)
+			{
+				psn = findKeyword(statement, "I", 0);
+				if(psn >= 0
+						&& findKeyword(statement, "you", psn) >= 0))
+				{
+					response = transformIYouStatement(statement);
+				}
+			}
+
+
 			else
 			{
 				response = getRandomResponse();
@@ -95,7 +114,21 @@ public class Magpie4
 		return "What would it mean to " + restOfStatement + "?";
 	}
 
-	
+	private String transformIWantStatement(String statement)
+	{
+		//  Remove the final period, if there is one
+		statement = statement.trim();
+		String lastChar = statement.substring(statement
+				.length() - 1);
+		if (lastChar.equals("."))
+		{
+			statement = statement.substring(0, statement
+					.length() - 1);
+		}
+		int psn = findKeyword (statement, "I want", 0);
+		String restOfStatement = statement.substring(psn + 6).trim();
+		return "Would you be really happy if you had " + restOfStatement + "?";
+	}
 	
 	/**
 	 * Take a statement with "you <something> me" and transform it into 
@@ -121,8 +154,25 @@ public class Magpie4
 		String restOfStatement = statement.substring(psnOfYou + 3, psnOfMe).trim();
 		return "What makes you think that I " + restOfStatement + " you?";
 	}
-	
-	
+
+	private String transformIYouStatement(String statement)
+	{
+		//  Remove the final period, if there is one
+		statement = statement.trim();
+		String lastChar = statement.substring(statement
+				.length() - 1);
+		if (lastChar.equals("."))
+		{
+			statement = statement.substring(0, statement
+					.length() - 1);
+		}
+
+		int psnOfYou = findKeyword (statement, "I", 0);
+		int psnOfMe = findKeyword (statement, "you", psnOfYou + 3);
+
+		String restOfStatement = statement.substring(psnOfYou + 3, psnOfMe).trim();
+		return "Why do you  " + restOfStatement + " me?";
+	}
 
 	
 	
